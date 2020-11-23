@@ -1,15 +1,18 @@
+# NAME: Knox Cavitt
+# DATE: November 22, 2020
+# DESCRIPTION: A quote block chain
+###################################
 import hashlib # For SHA-256
 import random # For the random DH parameters
 import string # Encode
 
-
+# Checks the first 10 bits
+##########################
 def first_10_set(hash_bytes):
  
-    #print(hash_bytes.hex())
     for i in range(2):
         for j in range(8):
-            #print("Checking " + str((hash_bytes[i] >> (7 - j)) & 1))
-            
+
             if ((hash_bytes[i] >> (7 -j)) & 1) != 0:
                 return -1
 
@@ -25,6 +28,7 @@ def gen_proof_of_work(quote_bytes, prev_hash):
     ten_set = 0
     random.seed()
     
+    # Calculates the proof of work
     while ten_set == 0:
         
         nonce = random.randint(1023, 2147483647)
@@ -48,8 +52,6 @@ def main():
 
     prev_hash = bytearray.fromhex("0001104ff3d8167569a620c033ad4f728635490c6af84a7f7a1108bb68418f47")
 
-    print ("Quote hex: " + quote.hex())
-    print ("Prev Hash: " + prev_hash.hex())
     print(gen_proof_of_work(quote, prev_hash))
 
     return 0
