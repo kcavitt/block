@@ -4,55 +4,52 @@ import string # Encode
 
 
 def first_10_set(hash_bytes):
-    set_bits = [] * 10
-    count = 0
-
-    to_test = int.from_bytes(hash_bytes, 'big')
-
-    while(count < 10):
+ 
+    #print(hash_bytes.hex())
+    for i in range(2):
+        for j in range(8):
+            #print("Checking " + str((hash_bytes[i] >> (7 - j)) & 1))
             
-        set_bits.append(to_test & 1)
-        to_test >> 1
-        count += 1
-    
-    for bit in set_bits:
-        if bit != 0: return -1
+            if ((hash_bytes[i] >> (7 -j)) & 1) != 0:
+                return -1
 
-    return 1
+            if i == 1 and j == 1:
+                return 1
 
 # Returns a nonce with
 # the first 10 bits set
 #######################
 def gen_proof_of_work(quote_bytes, prev_hash):
-    
-    running = prev_hash
+
     nonce = 0
-
     ten_set = 0
-
     random.seed()
     
     while ten_set == 0:
+        
         nonce = random.randint(1023, 2147483647)
-        running += nonce.to_bytes(4, 'big') # not right
+        running = bytearray(0)
+        running += prev_hash
+        running += nonce.to_bytes(4, 'big')
         running += quote_bytes
 
-        running = hashlib.sha256(running).hexdigest()
-
-        if first_10_set(bytearray.fromhex(running)): 
+        final = hashlib.sha256(running).hexdigest()
+        
+        if first_10_set(bytearray.fromhex(final)) == 1: 
             ten_set = 1
-       
 
-    print(running)
+    print(final)
     return nonce
 
 def main():
 
-    quote = "This is my quote"
+    quote = "Simple things should be simple. Complex things should be possible. -- Alan Kay"
     quote = quote.encode()
 
-    prev_hash = b"old hash"
+    prev_hash = bytearray.fromhex("0001104ff3d8167569a620c033ad4f728635490c6af84a7f7a1108bb68418f47")
 
+    print ("Quote hex: " + quote.hex())
+    print ("Prev Hash: " + prev_hash.hex())
     print(gen_proof_of_work(quote, prev_hash))
 
     return 0
